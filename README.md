@@ -27,20 +27,23 @@ Register now creates real member accounts (bcrypt-hashed passwords) - new accoun
 
 ## How to Run
 
-The site must be **served over HTTP** (the pages talk to a PHP API; opening `index.html` as a file will not work). The steps below use XAMPP on Windows:
+The site must be **served over HTTP** (the pages talk to a PHP API; opening `index.html` as a file will not work). The steps below use Laragon on Windows:
 
-```bash
-# 1. Start MySQL (Laragon) and import the database once:
-mysql -u root -p < Database/MySQL/fitspot.sql
+```powershell
+# 1. Start Laragon and make sure MySQL is running.
 
-# 2. Start the PHP server from the project root (Laragon ships PHP 8.1):
-php -S localhost:8000
+# 2. From the project root, import the database once:
+mysql -u root < Database/MySQL/fitspot.sql
 
-# 3. Open the site:
+# 3. Start the PHP server from the project root.
+# If "php" is not recognized, use the full Laragon PHP path:
+& "C:\laragon\bin\php\php-8.1.10-Win32-vs16-x64\php.exe" -S localhost:8000
+
+# 4. Open the site:
 #    http://localhost:8000
 ```
 
-The database connection in `api/db.php` uses the local MySQL server configured for XAMPP.
+If PHP is already added to your Windows `PATH`, you can start the server with `php -S localhost:8000` instead. The database connection in `api/db.php` uses MySQL on `127.0.0.1:3306` with the local `root` account and no password.
 
 ## Main Features
 
