@@ -8,9 +8,10 @@
     <link rel="stylesheet" href="../../css/user.css">
     <title>Gym Check-in - FitSpot</title>
 </head>
-<body class="user-body">
+<body class="admin-body user-body">
 <div class="admin-layout">
-    <aside class="sidebar">
+
+    <div class="sidebar">
         <div class="sidebar-brand">
             <img src="../../images/fitstop_white_logo.png" alt="FitSpot">
             <span>Gym Membership &amp; Class Booking</span>
@@ -20,12 +21,28 @@
             <a href="memberships.html">Membership Plans</a>
             <a href="classes.html">Fitness Classes</a>
             <a href="bookings.html">My Bookings</a>
-            <a href="profile.html">Profile</a>
             <a href="checkin.html" class="is-active" aria-current="page">Gym Check-in</a>
+            <a href="profile.html">Profile</a>
         </nav>
-    </aside>
+    </div>
+
     <div class="admin-main">
-        <header class="topbar"><h1>Gym Check-in</h1></header>
+        <header class="topbar">
+            <div class="topbar-actions">
+                <span class="admin-badge">Member</span>
+
+                <div class="admin-user">
+                    <button type="button" class="admin-avatar" id="user-avatar" aria-haspopup="true" aria-expanded="false">JD</button>
+
+                    <div class="admin-dropdown" id="user-dropdown" hidden>
+                        <a class="dropdown-item" href="profile.html">Profile</a>
+                        <a class="dropdown-item" href="bookings.html">My Bookings</a>
+                        <div class="dropdown-divider"></div>
+                        <button type="button" class="dropdown-item is-danger" id="user-logout">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </header>
         <main class="admin-content">
             <div class="section-head"><div><h2>QR Gym Check-in</h2><p>Show your QR code or scan the gym QR code.</p></div></div>
             <div class="profile-grid">
