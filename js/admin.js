@@ -121,18 +121,25 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     /* ===== page data loaders ===== */
 
-    async function loadDashboard() {
+    let recentPage = 1;
+
+    async function loadDashboard(page) {
         const membersEl = document.getElementById('stat-total-members');
         if (!membersEl) return;
+        recentPage = page || 1;
 
         try {
-            const data = await apiCall('GET', 'stats.php');
+            const data = await apiCall('GET', 'stats.php?page=' + recentPage);
             membersEl.textContent = data.stats.total_members;
             document.getElementById('stat-total-plans').textContent = data.stats.total_plans;
             document.getElementById('stat-total-classes').textContent = data.stats.total_classes;
             document.getElementById('stat-pending').textContent = data.stats.pending_reservations;
 
             const tbody = document.getElementById('tbody-recent');
+            const pagination = document.getElementById('recent-pagination');
+            const pageLabel = document.getElementById('recent-page-label');
+            const previousButton = document.getElementById('recent-prev');
+            const nextButton = document.getElementById('recent-next');
             if (tbody) {
                 if (!data.recent.length) {
                     errorRow(tbody, 4, 'No reservations yet.');
@@ -147,9 +154,29 @@ document.addEventListener('DOMContentLoaded', async function () {
                     }).join('');
                 }
             }
+            if (pagination && pageLabel && nextButton) {
+                pagination.hidden = recentPage === 1 && !data.recent_has_more;
+                pageLabel.textContent = 'Page ' + recentPage;
+                previousButton.hidden = recentPage === 1;
+                nextButton.hidden = !data.recent_has_more;
+            }
         } catch (error) {
             toast.error(friendlyMessage(error, 'Unable to load the dashboard.', SERVER_HINT));
         }
+    }
+
+    const recentNext = document.getElementById('recent-next');
+    if (recentNext) {
+        recentNext.addEventListener('click', function () {
+            loadDashboard(recentPage + 1);
+        });
+    }
+
+    const recentPrevious = document.getElementById('recent-prev');
+    if (recentPrevious) {
+        recentPrevious.addEventListener('click', function () {
+            if (recentPage > 1) loadDashboard(recentPage - 1);
+        });
     }
 
     async function loadPlans() {
