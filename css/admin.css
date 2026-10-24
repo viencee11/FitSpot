@@ -223,11 +223,49 @@
     font-size: 14px;
 }
 
-.notification-dropdown p {
+.notification-list {
+    max-height: 360px;
+    overflow-y: auto;
+    margin-top: 8px;
+}
+
+.notification-status {
     margin: 6px 0 0;
     color: #64748b;
     font-size: 13px;
     line-height: 1.45;
+}
+
+.notification-status--error {
+    color: #dc2626;
+}
+
+.notification-item {
+    display: block;
+    padding: 10px 0;
+    border-top: 1px solid #e2e8f0;
+}
+
+.notification-item:first-child {
+    border-top: 0;
+}
+
+.notification-item strong,
+.notification-item span {
+    display: block;
+}
+
+.notification-item strong {
+    color: #334155;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.notification-item span {
+    margin-top: 3px;
+    color: #64748b;
+    font-size: 12px;
+    line-height: 1.4;
 }
 
 .admin-user {
