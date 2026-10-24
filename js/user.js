@@ -125,6 +125,68 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     let profile = null;
     let myBookings = [];
+    let classSchedules = [];
+
+    function renderClassSchedules() {
+        const grid = document.getElementById('class-grid');
+        const search = document.getElementById('class-search');
+        const filter = document.getElementById('class-filter');
+        if (!grid) return;
+
+        const query = search ? search.value.trim().toLowerCase() : '';
+        const selectedFilter = filter ? filter.value : 'all';
+        const schedules = classSchedules.filter(function (slot) {
+            const text = (slot.name + ' ' + (slot.description || '')).toLowerCase();
+            const booked = slot.my_status !== null;
+            const full = slot.remaining <= 0;
+            const matchesSearch = !query || text.indexOf(query) !== -1;
+            const matchesFilter = selectedFilter === 'all'
+                || (selectedFilter === 'available' && !booked && !full)
+                || (selectedFilter === 'booked' && booked)
+                || (selectedFilter === 'full' && full);
+            return matchesSearch && matchesFilter;
+        });
+
+        if (!schedules.length) {
+            grid.innerHTML = '<p class="empty-state">No classes match your search or filter.</p>';
+            return;
+        }
+
+        grid.querySelectorAll('.class-card').forEach(function (card) { card.remove(); });
+        schedules.forEach(function (slot) {
+            const card = document.createElement('article');
+            card.className = 'class-card';
+            card.dataset.className = slot.name;
+            card.dataset.description = slot.description || '';
+            card.innerHTML = '<div class="class-card-head"><h3>' + esc(slot.name) +
+                '</h3><span class="badge ' + slot.badge_color + '">' + esc(slot.badge_label) +
+                '</span></div><p class="class-desc">' + esc(slot.description || '') +
+                '</p><p class="class-schedule">' + esc(slot.schedule) +
+                '</p><div class="slot-cell"><span class="slot-text">' + slot.booked + ' of ' +
+                slot.capacity + ' slots booked</span><div class="slot-bar' +
+                (slot.remaining <= 0 ? ' is-full' : '') + '"><span style="width: ' +
+                (slot.capacity > 0 ? Math.round(slot.booked / slot.capacity * 100) : 0) +
+                '%;"></span></div></div>';
+
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'btn-book';
+            if (slot.my_status !== null) {
+                button.disabled = true;
+                button.textContent = 'Booked';
+            } else if (slot.remaining <= 0) {
+                button.disabled = true;
+                button.textContent = 'Class Full';
+            } else {
+                button.dataset.book = slot.schedule_id;
+                button.dataset.name = slot.name;
+                button.dataset.remaining = slot.remaining;
+                button.textContent = 'Book Class';
+            }
+            card.appendChild(button);
+            grid.appendChild(card);
+        });
+    }
 
     async function loadProfile() {
         profile = await apiCall('GET', 'profile.php');
@@ -198,43 +260,16 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         try {
             const data = await apiCall('GET', 'classes.php?upcoming=1');
-            if (!data.schedules.length) {
+            classSchedules = data.schedules;
+            if (!classSchedules.length) {
                 grid.innerHTML = '<p class="empty-state">No upcoming classes are scheduled right now.</p>';
                 return;
             }
-
-            grid.innerHTML = data.schedules.map(function (slot) {
-                const isBooked = slot.my_status !== null;
-                const isFull = slot.remaining <= 0;
-                const percent = slot.capacity > 0
-                    ? Math.round((slot.booked / slot.capacity) * 100) : 0;
-
-                let button;
-                if (isBooked) {
-                    button = '<button type="button" class="btn-book" disabled>Booked</button>';
-                } else if (isFull) {
-                    button = '<button type="button" class="btn-book" disabled>Class Full</button>';
-                } else {
-                    button = '<button type="button" class="btn-book" data-book="' + slot.schedule_id +
-                        '" data-name="' + esc(slot.name) + '" data-remaining="' + slot.remaining +
-                        '">Book Class</button>';
-                }
-
-                return '' +
-                    '<article class="class-card">' +
-                        '<div class="class-card-head">' +
-                            '<h3>' + esc(slot.name) + '</h3>' +
-                            '<span class="badge ' + slot.badge_color + '">' + esc(slot.badge_label) + '</span>' +
-                        '</div>' +
-                        '<p class="class-desc">' + esc(slot.description || '') + '</p>' +
-                        '<p class="class-schedule">' + esc(slot.schedule) + '</p>' +
-                        '<div class="slot-cell">' +
-                            '<span class="slot-text">' + slot.booked + ' of ' + slot.capacity + ' slots booked</span>' +
-                            '<div class="slot-bar' + (isFull ? ' is-full' : '') + '"><span style="width: ' + percent + '%;"></span></div>' +
-                        '</div>' +
-                        button +
-                    '</article>';
-            }).join('');
+            renderClassSchedules();
+            const search = document.getElementById('class-search');
+            const filter = document.getElementById('class-filter');
+            if (search) search.addEventListener('input', renderClassSchedules);
+            if (filter) filter.addEventListener('change', renderClassSchedules);
         } catch (error) {
             toast.error(friendlyMessage(error, 'Unable to load classes.', SERVER_HINT));
         }
