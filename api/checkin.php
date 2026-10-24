@@ -82,7 +82,12 @@ endpoint(function () {
     );
     $stmt->execute([$memberId]);
     if ($stmt->fetch()) {
-        fail('This member has already checked in today.', 409);
+        json_out([
+            'checked_in' => false,
+            'already_checked_in' => true,
+            'message' => 'This member has already checked in today.',
+            'member_id' => $memberId,
+        ]);
     }
 
     $stmt = db()->prepare('INSERT INTO attendance (user_id, checked_in_at) VALUES (?, NOW())');
