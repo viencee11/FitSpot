@@ -126,6 +126,45 @@ document.addEventListener('DOMContentLoaded', async function () {
     let profile = null;
     let myBookings = [];
     let classSchedules = [];
+    const tablePages = {};
+
+    function renderPaginatedTable(key, tbody, items, colspan, emptyMessage, renderer) {
+        const tableCard = tbody.closest('.table-card');
+        let controls = tableCard ? tableCard.nextElementSibling : null;
+        if (!controls || !controls.classList.contains('table-pagination')) {
+            controls = document.createElement('div');
+            controls.className = 'table-pagination';
+            controls.innerHTML = '<button type="button" class="btn-sm btn-edit" data-page-prev>Previous</button>' +
+                '<span data-page-label></span>' +
+                '<button type="button" class="btn-sm btn-edit" data-page-next>Next</button>';
+            if (tableCard) tableCard.after(controls);
+        }
+
+        if (!items.length) {
+            controls.hidden = true;
+            tbody.innerHTML = '<tr><td colspan="' + colspan + '">' + esc(emptyMessage) + '</td></tr>';
+            return;
+        }
+
+        const pageSize = 5;
+        const totalPages = Math.ceil(items.length / pageSize);
+        const page = Math.min(tablePages[key] || 1, totalPages);
+        tablePages[key] = page;
+        const start = (page - 1) * pageSize;
+        tbody.innerHTML = items.slice(start, start + pageSize).map(renderer).join('');
+        controls.hidden = totalPages <= 1;
+        controls.querySelector('[data-page-label]').textContent = 'Page ' + page;
+        controls.querySelector('[data-page-prev]').hidden = page === 1;
+        controls.querySelector('[data-page-next]').hidden = page === totalPages;
+        controls.querySelector('[data-page-prev]').onclick = function () {
+            tablePages[key] = page - 1;
+            renderPaginatedTable(key, tbody, items, colspan, emptyMessage, renderer);
+        };
+        controls.querySelector('[data-page-next]').onclick = function () {
+            tablePages[key] = page + 1;
+            renderPaginatedTable(key, tbody, items, colspan, emptyMessage, renderer);
+        };
+    }
 
     function renderClassSchedules() {
         const grid = document.getElementById('class-grid');
@@ -242,17 +281,20 @@ document.addEventListener('DOMContentLoaded', async function () {
                 welcome.textContent = 'Welcome back, ' + first + '!';
             }
 
-            if (!upcoming.length) {
-                tbody.innerHTML = '<tr><td colspan="3">No upcoming bookings. Open Fitness Classes to reserve a slot.</td></tr>';
-            } else {
-                tbody.innerHTML = upcoming.slice(0, 5).map(function (booking) {
+            renderPaginatedTable(
+                'overview-bookings',
+                tbody,
+                upcoming,
+                3,
+                'No upcoming bookings. Open Fitness Classes to reserve a slot.',
+                function (booking) {
                     return '<tr>' +
                         '<td>' + esc(booking.class_name) + '</td>' +
                         '<td>' + esc(booking.schedule) + '</td>' +
                         '<td><span class="badge ' + booking.status_color + '">' + esc(booking.status_label) + '</span></td>' +
                         '</tr>';
-                }).join('');
-            }
+                }
+            );
 
             setText('stat-upcoming', upcoming.length);
             setText('stat-confirmed', upcoming.filter(function (booking) {
@@ -307,19 +349,25 @@ document.addEventListener('DOMContentLoaded', async function () {
             if (tableCard) tableCard.hidden = !hasBookings;
             if (emptyState) emptyState.hidden = hasBookings;
 
-            tbody.innerHTML = myBookings.map(function (booking) {
-                const action = booking.status === 'cancelled'
-                    ? ''
-                    : '<button type="button" class="btn-sm btn-delete" data-cancel-booking="' + booking.id + '">Cancel</button>';
+            renderPaginatedTable(
+                'my-bookings',
+                tbody,
+                myBookings,
+                4,
+                'You have no bookings yet. Open Fitness Classes to reserve a slot.',
+                function (booking) {
+                    const action = booking.status === 'cancelled'
+                        ? ''
+                        : '<button type="button" class="btn-sm btn-delete" data-cancel-booking="' + booking.id + '">Cancel</button>';
 
-                return '' +
-                    '<tr>' +
+                    return '<tr>' +
                         '<td>' + esc(booking.class_name) + '</td>' +
                         '<td>' + esc(booking.schedule) + '</td>' +
                         '<td class="status-cell"><span class="badge ' + booking.status_color + '">' + esc(booking.status_label) + '</span></td>' +
                         '<td>' + action + '</td>' +
-                    '</tr>';
-            }).join('');
+                        '</tr>';
+                }
+            );
         } catch (error) {
             toast.error(friendlyMessage(error, 'Unable to load bookings.', SERVER_HINT));
         }
