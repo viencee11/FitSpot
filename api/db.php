@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 /* Align PHP's clock with MySQL's (system, UTC+8) so date math agrees after midnight. */
@@ -128,8 +129,10 @@ function endpoint(callable $fn): void
     try {
         $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
         $script = basename($_SERVER['SCRIPT_NAME'] ?? '');
-        if (in_array($method, ['POST', 'PUT', 'DELETE'], true)
-            && !in_array($script, ['login.php', 'register.php'], true)) {
+        if (
+            in_array($method, ['POST', 'PUT', 'DELETE'], true)
+            && !in_array($script, ['login.php', 'register.php'], true)
+        ) {
             require_csrf();
         }
         $fn();
