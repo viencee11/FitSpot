@@ -171,6 +171,7 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
+    min-height: 270px;
     background-color: white;
     border-radius: 15px;
     padding: 22px;
@@ -217,7 +218,7 @@
 
 .btn-book {
     width: 100%;
-    margin-top: 6px;
+    margin-top: auto;
 }
 
 .class-card button:disabled {
