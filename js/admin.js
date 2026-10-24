@@ -255,6 +255,9 @@ document.addEventListener('DOMContentLoaded', async function () {
                     '<td>' + esc(member.plan) + '</td>' +
                     '<td><span class="badge ' + member.status_color + '">' + esc(member.status_label) + '</span></td>' +
                     '<td>' +
+                        (member.can_assign_plan
+                            ? '<button type="button" class="btn-sm btn-confirm" data-assign-plan>Assign Plan</button>'
+                            : '<button type="button" class="btn-sm" disabled title="Available after membership expiry or at renewal">Plan Active</button>') +
                         '<button type="button" class="btn-sm btn-delete" data-delete>Remove</button>' +
                     '</td>' +
                     '</tr>';
@@ -352,6 +355,12 @@ document.addEventListener('DOMContentLoaded', async function () {
                 { key: 'hours', label: 'Operating Hours', type: 'text', value: 'Monday - Saturday, 6:00 AM - 9:00 PM' },
                 { key: 'slots', label: 'Max Slots per Class', type: 'number', value: '10' }
             ]
+        },
+        memberPlan: {
+            label: 'Member Plan',
+            fields: [
+                { key: 'plan_id', label: 'Membership Plan', type: 'select' }
+            ]
         }
     };
 
@@ -397,6 +406,18 @@ document.addEventListener('DOMContentLoaded', async function () {
                 });
             } catch (error) {
                 setModalMessage(friendlyMessage(error, 'Unable to load classes.', SERVER_HINT), false);
+            }
+        }
+        if (type === 'memberPlan') {
+            try {
+                const data = await apiCall('GET', 'plans.php');
+                selectOptions = data.plans
+                    .filter(function (plan) { return plan.is_active; })
+                    .map(function (plan) {
+                        return { value: String(plan.id), label: plan.name };
+                    });
+            } catch (error) {
+                setModalMessage(friendlyMessage(error, 'Unable to load plans.', SERVER_HINT), false);
             }
         }
 
@@ -524,6 +545,17 @@ document.addEventListener('DOMContentLoaded', async function () {
                 return;
             }
 
+            if (currentType === 'memberPlan') {
+                await apiCall('POST', 'membership.php', {
+                    member_id: Number(currentRow.dataset.id),
+                    plan_id: Number(values.plan_id)
+                });
+                toast.success('Member plan assigned successfully.');
+                closeModal();
+                loadMembers();
+                return;
+            }
+
             if (currentType === 'profile') {
                 const updated = await apiCall('POST', 'profile.php', {
                     full_name: values.full_name,
@@ -628,6 +660,12 @@ document.addEventListener('DOMContentLoaded', async function () {
             const row = deleteButton.closest('tr');
             const table = row.closest('table');
             deleteEntity(table.dataset.entity, Number(row.dataset.id));
+            return;
+        }
+
+        const assignPlanButton = event.target.closest('[data-assign-plan]');
+        if (assignPlanButton) {
+            openForm('memberPlan', assignPlanButton.closest('tr'));
             return;
         }
 
