@@ -152,7 +152,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             return;
         }
 
-        grid.querySelectorAll('.class-card').forEach(function (card) { card.remove(); });
+        grid.replaceChildren();
         schedules.forEach(function (slot) {
             const card = document.createElement('article');
             card.className = 'class-card';
@@ -271,7 +271,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         try {
             const data = await apiCall('GET', 'classes.php?upcoming=1');
-            classSchedules = data.schedules;
+            classSchedules = Array.isArray(data.schedules) ? data.schedules : [];
             if (!classSchedules.length) {
                 grid.innerHTML = '<p class="empty-state">No upcoming classes are scheduled right now.</p>';
                 return;
