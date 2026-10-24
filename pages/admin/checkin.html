@@ -5,26 +5,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../../css/style.css">
     <link rel="stylesheet" href="../../css/admin.css">
+    <link rel="stylesheet" href="../../css/user.css">
     <title>Gym Check-in - FitSpot</title>
 </head>
 <body class="admin-body">
 <div class="admin-layout">
-    <aside class="sidebar">
+
+    <div class="sidebar">
         <div class="sidebar-brand">
             <img src="../../images/fitstop_white_logo.png" alt="FitSpot">
             <span>Gym Membership &amp; Class Booking</span>
         </div>
         <nav class="sidebar-menu">
-            <a href="dashboard.html">Overview</a>
+            <a href="dashboard.html">Dashboard</a>
             <a href="memberships.html">Membership Plans</a>
             <a href="classes.html">Fitness Classes</a>
+            <a href="schedules.html">Schedules</a>
             <a href="members.html">Members</a>
             <a href="reservations.html">Reservations</a>
             <a href="checkin.html" class="is-active" aria-current="page">Gym Check-in</a>
         </nav>
-    </aside>
+    </div>
+
     <div class="admin-main">
-        <header class="topbar"><h1>Gym Check-in</h1></header>
+        <header class="topbar">
+            <div class="topbar-actions">
+                <span class="admin-badge">Administrator</span>
+
+                <div class="admin-user">
+                    <button type="button" class="admin-avatar" id="admin-avatar" aria-haspopup="true" aria-expanded="false">YG</button>
+
+                    <div class="admin-dropdown" id="admin-dropdown" hidden>
+                        <button type="button" class="dropdown-item" data-open-form="profile">Profile</button>
+                        <button type="button" class="dropdown-item" data-open-form="settings">Settings</button>
+                        <div class="dropdown-divider"></div>
+                        <button type="button" class="dropdown-item is-danger" id="logout-btn">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </header>
         <main class="admin-content">
             <div class="section-head"><div><h2>QR Gym Check-in</h2><p>Generate the gym QR or scan a member QR.</p></div></div>
             <div class="profile-grid">
