@@ -296,6 +296,17 @@
 }
 
 @media (max-width: 600px) {
+    .class-filters {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .class-filters input,
+    .class-filters select {
+        width: 100%;
+        min-width: 0;
+    }
+
     .plans-grid,
     .class-grid,
     .profile-grid {
