@@ -104,7 +104,7 @@ async function startScan(videoId, messageId) {
                 await apiCall('POST', 'checkin.php', { payload: payload });
                 message.textContent = 'Member check-in recorded successfully.';
             } catch (error) {
-                message.textContent = error.message || 'Unable to check in member.';
+                showCheckinError(error, message, 'Unable to check in member.');
             }
             message.hidden = false;
         };
@@ -112,6 +112,16 @@ async function startScan(videoId, messageId) {
     } catch (error) {
         message.textContent = 'Camera access was blocked. Allow camera permission, use HTTPS/localhost, or scan a QR image instead.';
         message.hidden = false;
+    }
+}
+
+function showCheckinError(error, message, fallback) {
+    const text = error.apiMessage || error.message || fallback;
+    message.textContent = text;
+    if (error.status === 409) {
+        toast.warning(text);
+    } else {
+        toast.error(text);
     }
 }
 
@@ -151,7 +161,7 @@ function scanImage(file, messageId) {
             }
             apiCall('POST', 'checkin.php', { payload: result.data })
                 .then(function () { message.textContent = 'Member check-in recorded successfully.'; })
-                .catch(function (error) { message.textContent = error.message || 'Unable to check in member.'; })
+                .catch(function (error) { showCheckinError(error, message, 'Unable to check in member.'); })
                 .finally(function () { message.hidden = false; });
         };
         image.src = reader.result;
