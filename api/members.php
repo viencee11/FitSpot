@@ -42,6 +42,7 @@ endpoint(function () {
                 'plan'         => $row['plan_name'] ?? 'No plan',
                 'status_label' => $badge[0],
                 'status_color' => $badge[1],
+                'can_assign_plan' => $badge[0] !== 'Active',
             ];
         }
 
