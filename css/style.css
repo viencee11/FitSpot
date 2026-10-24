@@ -124,37 +124,40 @@ nav a:hover {
 
 @media (max-width: 768px) {
     header {
-        grid-template-columns: minmax(0, 1fr) auto auto;
-        justify-items: stretch;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
         text-align: left;
         position: sticky;
         padding: 14px 16px 18px;
     }
 
     header .brand {
-        justify-self: start;
+        flex: 1 1 auto;
+        min-width: 0;
         align-self: center;
         text-align: left;
     }
 
     header .header-actions {
-        grid-column: 2;
-        justify-self: end;
+        order: 2;
+        flex: 0 0 auto;
         justify-content: flex-end;
         margin-top: 0;
         margin-right: 2px;
     }
 
     .home-menu-toggle {
-        grid-column: 3;
+        order: 3;
         display: flex;
-        justify-self: end;
         align-self: center;
     }
 
     nav {
+        order: 4;
         display: none;
-        grid-column: 1 / -1;
+        flex: 0 0 100%;
         width: 100%;
         margin-top: 8px;
         padding-top: 8px;
@@ -182,11 +185,13 @@ nav a:hover {
     }
 
     .hero-inner {
+        width: min(100%, 520px);
         grid-template-columns: 1fr;
         gap: 35px;
     }
 
     .hero-content {
+        width: 100%;
         text-align: center;
     }
 
@@ -224,6 +229,7 @@ nav a:hover {
     }
 
     .hero-media {
+        width: 100%;
         max-width: 420px;
         margin: 0 auto;
     }
@@ -259,17 +265,17 @@ nav a:hover {
 .hero-inner {
     position: relative;
     width: 100%;
-    max-width: 1100px;
+    max-width: 900px;
     margin: 0 auto;
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 50px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 36px;
     align-items: center;
 }
 
 .hero-content {
     position: relative;
-    text-align: left;
+    text-align: center;
 }
 
 .hero-badge {
@@ -299,14 +305,14 @@ nav a:hover {
 
 .hero p {
     max-width: 600px;
-    margin: 0 0 30px;
+    margin: 0 auto 30px;
     font-size: 18px;
     color: #cbd5e1;
 }
 
 .hero-actions {
     display: flex;
-    justify-content: flex-start;
+    justify-content: center;
     flex-wrap: wrap;
     gap: 14px;
     margin-bottom: 50px;
@@ -335,7 +341,7 @@ nav a:hover {
 .hero-stats li {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     gap: 4px;
     min-width: 0;
 }
@@ -354,6 +360,9 @@ nav a:hover {
 
 .hero-media {
     position: relative;
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
 }
 
 .hero-carousel {
@@ -857,7 +866,6 @@ footer p {
 
 @media (max-width: 480px) {
     header {
-        grid-template-columns: minmax(0, 1fr) auto auto;
         padding: 12px 12px 14px;
     }
 
@@ -888,6 +896,18 @@ footer p {
         padding: 38px 16px 48px;
     }
 
+    .hero-inner {
+        width: 100%;
+    }
+
+    .hero-badge {
+        max-width: 100%;
+        padding: 6px 10px;
+        font-size: 10px;
+        letter-spacing: 1px;
+        overflow-wrap: anywhere;
+    }
+
     .hero h2 {
         font-size: 42px;
     }
@@ -902,6 +922,7 @@ footer p {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 18px 12px;
         width: 100%;
+        padding-top: 18px;
     }
 
     .hero-media {
@@ -910,6 +931,13 @@ footer p {
 
     .hero-carousel {
         height: 280px;
+    }
+
+    #membership article,
+    #classes article,
+    #membership article button,
+    #classes article button {
+        width: 100%;
     }
 
     #membership,
