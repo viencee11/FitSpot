@@ -2,11 +2,14 @@
 
 .admin-body {
     background-color: #f5f7fa;
+    overflow-x: hidden;
 }
 
 .admin-layout {
     display: flex;
     min-height: 100vh;
+    max-width: 100%;
+    overflow-x: hidden;
 }
 
 .sidebar {
