@@ -179,17 +179,52 @@ document.addEventListener('DOMContentLoaded', async function () {
         });
     }
 
+    const tablePages = {};
+
+    function renderTablePage(key, tbody, items, colspan, renderer) {
+        let controls = tbody.parentElement.parentElement.nextElementSibling;
+        if (!controls || !controls.classList.contains('table-pagination')) {
+            controls = document.createElement('div');
+            controls.className = 'table-pagination';
+            controls.innerHTML = '<button type="button" class="btn-sm btn-edit" data-page-prev>Previous</button>' +
+                '<span data-page-label></span>' +
+                '<button type="button" class="btn-sm btn-edit" data-page-next>Next</button>';
+            tbody.parentElement.parentElement.after(controls);
+        }
+
+        if (!items.length) {
+            controls.hidden = true;
+            errorRow(tbody, colspan, 'No records yet.');
+            return;
+        }
+
+        const pageSize = 5;
+        const totalPages = Math.ceil(items.length / pageSize);
+        const page = Math.min(tablePages[key] || 1, totalPages);
+        tablePages[key] = page;
+        const start = (page - 1) * pageSize;
+        tbody.innerHTML = items.slice(start, start + pageSize).map(renderer).join('');
+        controls.hidden = totalPages <= 1;
+        controls.querySelector('[data-page-label]').textContent = 'Page ' + page;
+        controls.querySelector('[data-page-prev]').hidden = page === 1;
+        controls.querySelector('[data-page-next]').hidden = page === totalPages;
+        controls.querySelector('[data-page-prev]').onclick = function () {
+            tablePages[key] = page - 1;
+            renderTablePage(key, tbody, items, colspan, renderer);
+        };
+        controls.querySelector('[data-page-next]').onclick = function () {
+            tablePages[key] = page + 1;
+            renderTablePage(key, tbody, items, colspan, renderer);
+        };
+    }
+
     async function loadPlans() {
         const tbody = document.getElementById('tbody-plans');
         if (!tbody) return;
 
         try {
             const data = await apiCall('GET', 'plans.php');
-            if (!data.plans.length) {
-                errorRow(tbody, 4, 'No membership plans yet. Use "+ Add Plan" to create one.');
-                return;
-            }
-            tbody.innerHTML = data.plans.map(function (plan) {
+            renderTablePage('plans', tbody, data.plans, 4, function (plan) {
                 return '<tr data-id="' + plan.id + '">' +
                     '<td data-field="name">' + esc(plan.name) + '</td>' +
                     '<td data-field="price">' + peso(plan.price) + '</td>' +
@@ -199,7 +234,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                         '<button type="button" class="btn-sm btn-delete" data-delete>Delete</button>' +
                     '</td>' +
                     '</tr>';
-            }).join('');
+            });
         } catch (error) {
             errorRow(tbody, 4, friendlyMessage(error, 'Unable to load plans.', SERVER_HINT));
         }
@@ -211,11 +246,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         try {
             const data = await apiCall('GET', 'classes.php');
-            if (!data.classes.length) {
-                errorRow(tbody, 4, 'No fitness classes yet. Use "+ Add Class" to create one.');
-                return;
-            }
-            tbody.innerHTML = data.classes.map(function (fitnessClass) {
+            renderTablePage('classes', tbody, data.classes, 4, function (fitnessClass) {
                 return '<tr data-id="' + fitnessClass.id + '">' +
                     '<td data-field="name">' + esc(fitnessClass.name) + '</td>' +
                     '<td data-field="description">' + esc(fitnessClass.description) + '</td>' +
@@ -225,7 +256,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                         '<button type="button" class="btn-sm btn-delete" data-delete>Delete</button>' +
                     '</td>' +
                     '</tr>';
-            }).join('');
+            });
         } catch (error) {
             errorRow(tbody, 4, friendlyMessage(error, 'Unable to load classes.', SERVER_HINT));
         }
@@ -237,11 +268,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         try {
             const data = await apiCall('GET', 'schedules.php?all=1');
-            if (!data.schedules.length) {
-                errorRow(tbody, 5, 'No class schedules yet. Use "+ Add Schedule" to create one.');
-                return;
-            }
-            tbody.innerHTML = data.schedules.map(function (slot) {
+            renderTablePage('schedules', tbody, data.schedules, 5, function (slot) {
                 return '<tr data-id="' + slot.schedule_id + '">' +
                     '<td>' + esc(slot.class_name) + '</td>' +
                     '<td>' + esc(slot.schedule) + '</td>' +
@@ -259,7 +286,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                         '<button type="button" class="btn-sm btn-delete" data-delete>Delete</button>' +
                     '</td>' +
                     '</tr>';
-            }).join('');
+            });
         } catch (error) {
             errorRow(tbody, 5, friendlyMessage(error, 'Unable to load schedules.', SERVER_HINT));
         }
@@ -271,11 +298,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         try {
             const data = await apiCall('GET', 'members.php');
-            if (!data.members.length) {
-                errorRow(tbody, 5, 'No members registered yet.');
-                return;
-            }
-            tbody.innerHTML = data.members.map(function (member) {
+            renderTablePage('members', tbody, data.members, 5, function (member) {
                 return '<tr data-id="' + member.id + '">' +
                     '<td>' + esc(member.full_name) + '</td>' +
                     '<td>' + esc(member.email) + '</td>' +
@@ -288,7 +311,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                         '<button type="button" class="btn-sm btn-delete" data-delete>Remove</button>' +
                     '</td>' +
                     '</tr>';
-            }).join('');
+            });
         } catch (error) {
             errorRow(tbody, 5, friendlyMessage(error, 'Unable to load members.', SERVER_HINT));
         }
@@ -300,11 +323,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         try {
             const data = await apiCall('GET', 'reservations.php');
-            if (!data.reservations.length) {
-                errorRow(tbody, 5, 'No reservations yet.');
-                return;
-            }
-            tbody.innerHTML = data.reservations.map(function (row) {
+            renderTablePage('reservations', tbody, data.reservations, 5, function (row) {
                 const done = row.status !== 'pending';
                 return '<tr data-id="' + row.id + '">' +
                     '<td>' + esc(row.member) + '</td>' +
@@ -316,7 +335,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                         '<button type="button" class="btn-sm btn-delete" data-cancel' + (done ? ' disabled' : '') + '>Cancel</button>' +
                     '</td>' +
                     '</tr>';
-            }).join('');
+            });
         } catch (error) {
             errorRow(tbody, 5, friendlyMessage(error, 'Unable to load reservations.', SERVER_HINT));
         }
