@@ -87,6 +87,25 @@
 
 /* ===== FITNESS CLASS CARDS ===== */
 
+.class-filters {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.class-filters input,
+.class-filters select {
+    min-height: 42px;
+    padding: 0 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #fff;
+}
+
+.class-filters input {
+    min-width: 260px;
+}
+
 .class-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
