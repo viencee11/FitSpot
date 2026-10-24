@@ -57,6 +57,26 @@ header .header-actions {
     gap: 10px;
 }
 
+.home-menu-toggle {
+    display: none;
+    width: 42px;
+    height: 42px;
+    padding: 10px;
+    border: 0;
+    border-radius: 8px;
+    background-color: #1e293b;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.home-menu-toggle span {
+    display: block;
+    width: 100%;
+    height: 2px;
+    border-radius: 2px;
+    background-color: white;
+}
+
 .login-link {
     display: flex;
     align-items: center;
@@ -103,24 +123,59 @@ nav a:hover {
 
 @media (max-width: 768px) {
     header {
-        grid-template-columns: 1fr;
-        justify-items: center;
-        text-align: center;
+        grid-template-columns: 1fr auto;
+        justify-items: stretch;
+        text-align: left;
+        position: sticky;
+        padding: 14px 16px 18px;
     }
 
     header .brand {
-        justify-self: center;
-        text-align: center;
+        justify-self: start;
+        align-self: center;
+        text-align: left;
     }
 
     header .header-actions {
-        justify-self: center;
-        flex-wrap: wrap;
-        justify-content: center;
+        grid-column: 1 / -1;
+        justify-self: stretch;
+        justify-content: flex-end;
+        margin-top: 8px;
+    }
+
+    .home-menu-toggle {
+        display: flex;
+        justify-self: end;
+        align-self: center;
+    }
+
+    nav {
+        display: none;
+        grid-column: 1 / -1;
+        width: 100%;
+        margin-top: 8px;
+        padding-top: 8px;
+        border-top: 1px solid #1e293b;
+    }
+
+    header.is-menu-open nav {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 6px;
+    }
+
+    nav a {
+        padding: 8px 6px;
+        font-size: 14px;
+    }
+
+    header.is-menu-open nav a:last-child {
+        grid-column: 1 / -1;
     }
 
     .hero {
-        padding: 60px 20px;
+        min-height: auto;
+        padding: 48px 20px 56px;
     }
 
     .hero-inner {
@@ -132,6 +187,15 @@ nav a:hover {
         text-align: center;
     }
 
+    .hero-badge {
+        max-width: 100%;
+        margin-bottom: 18px;
+    }
+
+    .hero h2 {
+        font-size: clamp(40px, 12vw, 52px);
+    }
+
     .hero p {
         margin: 0 auto 30px;
     }
@@ -139,6 +203,17 @@ nav a:hover {
     .hero-actions,
     .hero-stats {
         justify-content: center;
+    }
+
+    .hero-actions {
+        flex-direction: column;
+        align-items: stretch;
+        max-width: 280px;
+        margin: 0 auto 30px;
+    }
+
+    .hero-actions button {
+        width: 100%;
     }
 
     .hero-stats li {
@@ -774,6 +849,46 @@ footer p {
 }
 
 @media (max-width: 480px) {
+    header .brand img {
+        height: 30px;
+    }
+
+    nav a {
+        font-size: 13px;
+    }
+
+    header .header-actions {
+        margin-top: 6px;
+    }
+
+    .hero {
+        padding: 38px 16px 48px;
+    }
+
+    .hero h2 {
+        font-size: 42px;
+    }
+
+    .hero p {
+        max-width: 280px;
+        font-size: 16px;
+    }
+
+    .hero-stats {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px 12px;
+        width: 100%;
+    }
+
+    .hero-media {
+        width: 100%;
+    }
+
+    .hero-carousel {
+        height: 280px;
+    }
+
     .modal-overlay {
         padding: 12px;
     }
@@ -860,5 +975,3 @@ footer p {
         transform: none;
     }
 }
-
-
