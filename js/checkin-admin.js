@@ -101,8 +101,12 @@ async function startScan(videoId, messageId) {
             if (!payload) return requestAnimationFrame(scan);
             stream.getTracks().forEach(function (track) { track.stop(); });
             try {
-                await apiCall('POST', 'checkin.php', { payload: payload });
-                message.textContent = 'Member check-in recorded successfully.';
+                const data = await apiCall('POST', 'checkin.php', { payload: payload });
+                if (data.already_checked_in) {
+                    showAlreadyCheckedIn(message, data.message);
+                } else {
+                    message.textContent = 'Member check-in recorded successfully.';
+                }
             } catch (error) {
                 showCheckinError(error, message, 'Unable to check in member.');
             }
@@ -113,6 +117,11 @@ async function startScan(videoId, messageId) {
         message.textContent = 'Camera access was blocked. Allow camera permission, use HTTPS/localhost, or scan a QR image instead.';
         message.hidden = false;
     }
+}
+
+function showAlreadyCheckedIn(message, text) {
+    message.textContent = text;
+    toast.warning(text);
 }
 
 function showCheckinError(error, message, fallback) {
@@ -160,7 +169,13 @@ function scanImage(file, messageId) {
                 return;
             }
             apiCall('POST', 'checkin.php', { payload: result.data })
-                .then(function () { message.textContent = 'Member check-in recorded successfully.'; })
+                .then(function (data) {
+                    if (data.already_checked_in) {
+                        showAlreadyCheckedIn(message, data.message);
+                    } else {
+                        message.textContent = 'Member check-in recorded successfully.';
+                    }
+                })
                 .catch(function (error) { showCheckinError(error, message, 'Unable to check in member.'); })
                 .finally(function () { message.hidden = false; });
         };
