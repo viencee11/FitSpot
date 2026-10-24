@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     try {
         const me = await apiCall('GET', 'me.php');
         if (me.role !== 'member') throw new Error('Only members can check in here.');
+        initializeUserMenu(me);
         const data = await apiCall('GET', 'checkin.php?action=member-qr');
         new QRCode(document.getElementById('member-qr'), { text: data.payload, width: 220, height: 220 });
     } catch (error) {
@@ -19,6 +20,53 @@ document.addEventListener('DOMContentLoaded', async function () {
         scanImage(event.target.files[0], 'gym-checkin-message');
     });
 });
+
+function initializeUserMenu(user) {
+    const avatar = document.getElementById('user-avatar');
+    const dropdown = document.getElementById('user-dropdown');
+    const logoutButton = document.getElementById('user-logout');
+    if (!avatar) return;
+
+    avatar.textContent = initials(user.full_name);
+
+    if (dropdown) {
+        avatar.addEventListener('click', function (event) {
+            event.stopPropagation();
+            const isOpen = dropdown.hidden;
+            dropdown.hidden = !isOpen;
+            avatar.setAttribute('aria-expanded', String(isOpen));
+        });
+
+        document.addEventListener('click', function (event) {
+            if (!dropdown.hidden && !dropdown.contains(event.target)) {
+                dropdown.hidden = true;
+                avatar.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
+
+    if (logoutButton) {
+        logoutButton.addEventListener('click', async function () {
+            const confirmed = await confirmDialog(
+                'Confirm Logout',
+                'Are you sure you want to logout?',
+                'Logout'
+            );
+            if (!confirmed) return;
+            try { await apiCall('POST', 'logout.php'); } catch (error) {}
+            window.location.replace('../../index.html');
+        });
+    }
+}
+
+function initials(fullName) {
+    return String(fullName || '')
+        .split(/\s+/)
+        .filter(Boolean)
+        .slice(0, 2)
+        .map(function (word) { return word[0].toUpperCase(); })
+        .join('') || '?';
+}
 
 function setupMobileMenu() {
     const layout = document.querySelector('.admin-layout');
@@ -87,8 +135,12 @@ async function startScan(videoId, messageId) {
             if (!payload) return requestAnimationFrame(scan);
             stream.getTracks().forEach(function (track) { track.stop(); });
             try {
-                await apiCall('POST', 'checkin.php', { payload: payload });
-                message.textContent = 'Check-in recorded successfully.';
+                const data = await apiCall('POST', 'checkin.php', { payload: payload });
+                if (data.already_checked_in) {
+                    showAlreadyCheckedIn(message, data.message);
+                } else {
+                    message.textContent = 'Check-in recorded successfully.';
+                }
             } catch (error) {
                 showCheckinError(error, message, 'Unable to check in.');
             }
@@ -99,6 +151,11 @@ async function startScan(videoId, messageId) {
         message.textContent = 'Camera access was blocked. Allow camera permission, use HTTPS/localhost, or scan a QR image instead.';
         message.hidden = false;
     }
+}
+
+function showAlreadyCheckedIn(message, text) {
+    message.textContent = text;
+    toast.warning(text);
 }
 
 function showCheckinError(error, message, fallback) {
@@ -146,7 +203,13 @@ function scanImage(file, messageId) {
                 return;
             }
             apiCall('POST', 'checkin.php', { payload: result.data })
-                .then(function () { message.textContent = 'Check-in recorded successfully.'; })
+                .then(function (data) {
+                    if (data.already_checked_in) {
+                        showAlreadyCheckedIn(message, data.message);
+                    } else {
+                        message.textContent = 'Check-in recorded successfully.';
+                    }
+                })
                 .catch(function (error) { showCheckinError(error, message, 'Unable to check in.'); })
                 .finally(function () { message.hidden = false; });
         };
