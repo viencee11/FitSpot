@@ -1,4 +1,34 @@
 document.addEventListener('DOMContentLoaded', function () {
+    const homeHeader = document.querySelector('body > header');
+    const homeMenuToggle = document.querySelector('.home-menu-toggle');
+    const homeNavigation = document.getElementById('home-navigation');
+
+    if (homeHeader && homeMenuToggle && homeNavigation) {
+        function closeHomeMenu() {
+            homeHeader.classList.remove('is-menu-open');
+            homeMenuToggle.setAttribute('aria-expanded', 'false');
+            homeMenuToggle.setAttribute('aria-label', 'Open navigation menu');
+        }
+
+        homeMenuToggle.addEventListener('click', function (event) {
+            event.stopPropagation();
+            const isOpen = homeHeader.classList.toggle('is-menu-open');
+            homeMenuToggle.setAttribute('aria-expanded', String(isOpen));
+            homeMenuToggle.setAttribute('aria-label', isOpen ? 'Close navigation menu' : 'Open navigation menu');
+        });
+
+        homeNavigation.querySelectorAll('a').forEach(function (link) {
+            link.addEventListener('click', closeHomeMenu);
+        });
+
+        document.addEventListener('click', function (event) {
+            if (homeHeader.classList.contains('is-menu-open')
+                && !homeHeader.contains(event.target)) {
+                closeHomeMenu();
+            }
+        });
+    }
+
     const overlays = document.querySelectorAll('.modal-overlay');
 
     function openModal(id) {
