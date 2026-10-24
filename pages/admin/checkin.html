@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/admin.css">
+    <title>Gym Check-in - FitSpot</title>
+</head>
+<body class="admin-body">
+<div class="admin-layout">
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <img src="../../images/fitstop_white_logo.png" alt="FitSpot">
+            <span>Gym Membership &amp; Class Booking</span>
+        </div>
+        <nav class="sidebar-menu">
+            <a href="dashboard.html">Overview</a>
+            <a href="memberships.html">Membership Plans</a>
+            <a href="classes.html">Fitness Classes</a>
+            <a href="members.html">Members</a>
+            <a href="reservations.html">Reservations</a>
+            <a href="checkin.html" class="is-active" aria-current="page">Gym Check-in</a>
+        </nav>
+    </aside>
+    <div class="admin-main">
+        <header class="topbar"><h1>Gym Check-in</h1></header>
+        <main class="admin-content">
+            <div class="section-head"><div><h2>QR Gym Check-in</h2><p>Generate the gym QR or scan a member QR.</p></div></div>
+            <div class="profile-grid">
+                <div class="form-card">
+                    <h3>Gym QR</h3>
+                    <p>Members scan this code to check in.</p>
+                    <button type="button" id="show-gym-qr">Show Gym QR Code</button>
+                </div>
+                <div class="form-card">
+                    <h3>Scan Member QR</h3>
+                    <video id="member-qr-camera" class="qr-camera" playsinline hidden></video>
+                    <button type="button" id="start-member-scan">Scan Member QR</button>
+                    <label class="qr-upload-label" for="member-qr-image">Or upload/take a QR image</label>
+                    <input class="qr-upload" type="file" id="member-qr-image" accept="image/*" capture="environment">
+                    <small class="qr-help">Camera scanning requires HTTPS or localhost. Image scanning works when live QR detection is unavailable.</small>
+                    <p id="member-checkin-message" class="form-message" hidden></p>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<div class="modal-overlay" id="gym-qr-modal" aria-hidden="true">
+    <div class="modal auth-card qr-modal" role="dialog" aria-modal="true" aria-labelledby="gym-qr-title">
+        <button type="button" class="modal-close" id="close-gym-qr" aria-label="Close">&times;</button>
+        <div class="modal-body">
+            <h2 id="gym-qr-title">Gym Check-in QR</h2>
+            <div id="gym-qr" class="qr-box"></div>
+            <p>Members can scan this code to check in.</p>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+<script src="../../js/toast.js" defer></script>
+<script src="../../js/api.js" defer></script>
+<script src="../../js/checkin-admin.js" defer></script>
+</body>
+</html>
