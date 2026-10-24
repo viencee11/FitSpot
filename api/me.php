@@ -17,5 +17,6 @@ endpoint(function () {
         'phone'      => $user['phone'],
         'address'    => $user['address'],
         'created_at' => $user['created_at'],
+        'csrf'       => csrf_token(),
     ]);
 });
