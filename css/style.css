@@ -123,7 +123,7 @@ nav a:hover {
 
 @media (max-width: 768px) {
     header {
-        grid-template-columns: 1fr auto;
+        grid-template-columns: minmax(0, 1fr) auto auto;
         justify-items: stretch;
         text-align: left;
         position: sticky;
@@ -137,13 +137,15 @@ nav a:hover {
     }
 
     header .header-actions {
-        grid-column: 1 / -1;
-        justify-self: stretch;
+        grid-column: 2;
+        justify-self: end;
         justify-content: flex-end;
-        margin-top: 8px;
+        margin-top: 0;
+        margin-right: 2px;
     }
 
     .home-menu-toggle {
+        grid-column: 3;
         display: flex;
         justify-self: end;
         align-self: center;
