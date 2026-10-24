@@ -205,7 +205,18 @@ document.addEventListener('DOMContentLoaded', async function () {
 
             card.classList.toggle('is-current', isCurrent);
             if (tag) tag.hidden = !isCurrent;
-            if (choose) choose.hidden = isCurrent;
+            if (choose) {
+                const active = Boolean(profile && profile.membership
+                    && profile.membership.status === 'active');
+                choose.hidden = false;
+                choose.disabled = true;
+                choose.textContent = isCurrent
+                    ? 'Current Plan'
+                    : (active ? 'Unavailable until renewal' : 'Admin assignment only');
+                choose.title = active
+                    ? 'This plan is unavailable until your current membership expires'
+                    : 'Only an administrator can assign a membership plan';
+            }
         });
 
         setText('stat-plan', planName || 'No plan');
