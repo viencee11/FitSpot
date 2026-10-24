@@ -448,6 +448,23 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
+.table-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.table-pagination[hidden] {
+    display: none;
+}
+
+.table-pagination span {
+    color: #64748b;
+    font-size: 13px;
+}
+
 .table-card table {
     width: 100%;
     border-collapse: collapse;
