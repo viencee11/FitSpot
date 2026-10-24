@@ -14,9 +14,13 @@
     })();
 
     window.SERVER_HINT = ' Could not reach the server - start it with: php -S localhost:8000';
+    window.CSRF_TOKEN = '';
 
     window.apiCall = async function (method, file, body) {
         const options = { method: method, headers: {} };
+        if (window.CSRF_TOKEN && ['POST', 'PUT', 'DELETE'].indexOf(method) !== -1) {
+            options.headers['X-CSRF-Token'] = window.CSRF_TOKEN;
+        }
         if (body !== undefined) {
             options.headers['Content-Type'] = 'application/json';
             options.body = JSON.stringify(body);
@@ -31,6 +35,7 @@
         }
         let data = null;
         try { data = await res.json(); } catch (parseError) {}
+        if (data && data.csrf) window.CSRF_TOKEN = String(data.csrf);
         if (!res.ok) {
             const error = new Error((data && data.error) || '');
             error.status = res.status;
