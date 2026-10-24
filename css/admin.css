@@ -410,6 +410,66 @@
     margin-bottom: 28px;
 }
 
+.quick-links-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+    margin-bottom: 28px;
+}
+
+.quick-link-card {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    min-width: 0;
+    padding: 17px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background-color: white;
+    color: #0f172a;
+    box-shadow: 0 3px 10px rgba(15, 23, 42, 0.06);
+    text-decoration: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.quick-link-card:hover {
+    border-color: #f97316;
+    color: #0f172a;
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.11);
+    text-decoration: none;
+    transform: translateY(-2px);
+}
+
+.quick-link-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 38px;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background-color: rgba(249, 115, 22, 0.12);
+    color: #ea580c;
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.quick-link-card strong,
+.quick-link-card small {
+    display: block;
+}
+
+.quick-link-card strong {
+    font-size: 14px;
+}
+
+.quick-link-card small {
+    margin-top: 4px;
+    color: #64748b;
+    font-size: 12px;
+    line-height: 1.35;
+}
+
 .stat-card {
     background-color: white;
     border-radius: 15px;
