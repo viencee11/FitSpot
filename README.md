@@ -179,7 +179,6 @@ FitSpot/
 │   ├── user.js             # Member portal logic (API guard, filters, booking/cancel, plans, profile)
 │   ├── checkin-admin.js    # Admin QR generation, member scanning, and duplicate check-in handling
 │   ├── checkin-user.js     # Member QR generation, gym scanning, and duplicate check-in handling
-│   └── reload.js            # Shared portal reload button
 └── pages/
     ├── login.html          # Standalone login / registration page
     ├── admin/
