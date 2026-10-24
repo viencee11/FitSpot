@@ -2,8 +2,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const actions = document.querySelector('.topbar-actions');
     if (!actions || actions.querySelector('.notification-menu')) return;
 
-    const isAdmin = actions.querySelector('.admin-badge')
-        && actions.querySelector('.admin-badge').textContent.trim().toLowerCase() === 'administrator';
     const wrapper = document.createElement('div');
     wrapper.className = 'notification-menu';
     wrapper.innerHTML =
@@ -17,11 +15,60 @@ document.addEventListener('DOMContentLoaded', function () {
         '</button>' +
         '<div class="notification-dropdown" hidden>' +
             '<strong>Notifications</strong>' +
-            '<p>' + (isAdmin ? 'Membership and check-in activity will appear here.' : 'Booking and membership updates will appear here.') + '</p>' +
+            '<div class="notification-list" aria-live="polite">' +
+                '<p class="notification-status">Loading notifications...</p>' +
+            '</div>' +
         '</div>';
 
     const button = wrapper.querySelector('.notification-button');
     const dropdown = wrapper.querySelector('.notification-dropdown');
+    const list = wrapper.querySelector('.notification-list');
+    const dot = wrapper.querySelector('.notification-dot');
+
+    function renderNotifications(notifications) {
+        list.replaceChildren();
+        dot.hidden = notifications.length === 0;
+
+        if (!notifications.length) {
+            const empty = document.createElement('p');
+            empty.className = 'notification-status';
+            empty.textContent = 'You have no new notifications.';
+            list.appendChild(empty);
+            return;
+        }
+
+        notifications.forEach(function (notification) {
+            const item = document.createElement('article');
+            item.className = 'notification-item notification-item--' + notification.type;
+
+            const message = document.createElement('strong');
+            message.textContent = notification.message || 'New notification';
+            item.appendChild(message);
+
+            if (notification.detail) {
+                const detail = document.createElement('span');
+                detail.textContent = notification.detail;
+                item.appendChild(detail);
+            }
+            list.appendChild(item);
+        });
+    }
+
+    async function loadNotifications() {
+        try {
+            const data = await apiCall('GET', 'notifications.php');
+            renderNotifications(Array.isArray(data.notifications) ? data.notifications : []);
+        } catch (error) {
+            if (error && error.status === 401) return;
+            list.replaceChildren();
+            const failure = document.createElement('p');
+            failure.className = 'notification-status notification-status--error';
+            failure.textContent = 'Unable to load notifications.';
+            list.appendChild(failure);
+            dot.hidden = true;
+        }
+    }
+
     button.addEventListener('click', function (event) {
         event.stopPropagation();
         const isOpen = dropdown.hidden;
@@ -37,4 +84,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     actions.insertBefore(wrapper, actions.firstChild);
+    dot.hidden = true;
+    loadNotifications();
+    window.setInterval(loadNotifications, 30000);
 });
