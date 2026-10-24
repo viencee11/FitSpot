@@ -236,6 +236,7 @@
 
 .admin-content {
     padding: 28px;
+    min-width: 0;
 }
 
 .admin-view {
@@ -263,6 +264,12 @@
     border-radius: 16px;
     background-color: #ffffff;
     box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
+}
+
+.section-head > div,
+.form-card,
+.stat-card {
+    min-width: 0;
 }
 
 .section-actions {
@@ -545,15 +552,15 @@ button:disabled {
     }
 
     .sidebar-menu {
-        flex-direction: row;
-        flex-wrap: wrap;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 8px;
-        overflow-x: auto;
+        overflow: visible;
     }
 
     .sidebar-menu button,
     .sidebar-menu a {
-        width: auto;
+        width: 100%;
         border-left: none;
         border-bottom: 3px solid transparent;
         padding: 10px 14px;
@@ -590,8 +597,8 @@ button:disabled {
     }
 
     .topbar-actions {
-        width: 100%;
-        justify-content: space-between;
+        width: auto;
+        margin-left: auto;
     }
 
     .section-head {
@@ -627,6 +634,19 @@ button:disabled {
 
     .table-card td:last-child {
         white-space: nowrap;
+    }
+
+    .section-head h2 {
+        font-size: 18px;
+    }
+
+    .sidebar-menu {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar-menu button,
+    .sidebar-menu a {
+        padding: 11px 12px;
     }
 }
 
