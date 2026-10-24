@@ -77,20 +77,35 @@ endpoint(function () {
         fail('An active membership is required to check in.', 403);
     }
 
-    $stmt = db()->prepare(
-        'SELECT id FROM attendance WHERE user_id = ? AND DATE(checked_in_at) = CURDATE() LIMIT 1'
-    );
-    $stmt->execute([$memberId]);
-    if ($stmt->fetch()) {
-        json_out([
-            'checked_in' => false,
-            'already_checked_in' => true,
-            'message' => 'This member has already checked in today.',
-            'member_id' => $memberId,
-        ]);
+    $pdo = db();
+    $pdo->beginTransaction();
+    try {
+        $stmt = $pdo->prepare('SELECT id FROM users WHERE id = ? FOR UPDATE');
+        $stmt->execute([$memberId]);
+
+        $stmt = $pdo->prepare(
+            'SELECT id FROM attendance WHERE user_id = ? AND DATE(checked_in_at) = CURDATE() LIMIT 1'
+        );
+        $stmt->execute([$memberId]);
+        if ($stmt->fetch()) {
+            $pdo->rollBack();
+            json_out([
+                'checked_in' => false,
+                'already_checked_in' => true,
+                'message' => 'This member has already checked in today.',
+                'member_id' => $memberId,
+            ]);
+        }
+
+        $stmt = $pdo->prepare('INSERT INTO attendance (user_id, checked_in_at) VALUES (?, NOW())');
+        $stmt->execute([$memberId]);
+        $pdo->commit();
+    } catch (Throwable $e) {
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+        throw $e;
     }
 
-    $stmt = db()->prepare('INSERT INTO attendance (user_id, checked_in_at) VALUES (?, NOW())');
-    $stmt->execute([$memberId]);
     json_out(['checked_in' => true, 'member_id' => $memberId, 'checked_in_at' => date('Y-m-d H:i:s')], 201);
 });
