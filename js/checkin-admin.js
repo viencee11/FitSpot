@@ -18,6 +18,9 @@ document.addEventListener('DOMContentLoaded', async function () {
     });
 
     try {
+        const me = await apiCall('GET', 'me.php');
+        if (me.role !== 'admin') throw new Error('Only administrators can access this page.');
+        initializeAdminMenu(me);
         const data = await apiCall('GET', 'checkin.php?action=gym-qr');
         new QRCode(document.getElementById('gym-qr'), { text: data.payload, width: 220, height: 220 });
     } catch (error) {
@@ -33,6 +36,53 @@ document.addEventListener('DOMContentLoaded', async function () {
         scanImage(event.target.files[0], 'member-checkin-message');
     });
 });
+
+function initializeAdminMenu(user) {
+    const avatar = document.getElementById('admin-avatar');
+    const dropdown = document.getElementById('admin-dropdown');
+    const logoutButton = document.getElementById('logout-btn');
+    if (!avatar) return;
+
+    avatar.textContent = initials(user.full_name);
+
+    if (dropdown) {
+        avatar.addEventListener('click', function (event) {
+            event.stopPropagation();
+            const isOpen = dropdown.hidden;
+            dropdown.hidden = !isOpen;
+            avatar.setAttribute('aria-expanded', String(isOpen));
+        });
+
+        document.addEventListener('click', function (event) {
+            if (!dropdown.hidden && !dropdown.contains(event.target)) {
+                dropdown.hidden = true;
+                avatar.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
+
+    if (logoutButton) {
+        logoutButton.addEventListener('click', async function () {
+            const confirmed = await confirmDialog(
+                'Confirm Logout',
+                'Are you sure you want to logout?',
+                'Logout'
+            );
+            if (!confirmed) return;
+            try { await apiCall('POST', 'logout.php'); } catch (error) {}
+            window.location.replace('../../index.html');
+        });
+    }
+}
+
+function initials(fullName) {
+    return String(fullName || '')
+        .split(/\s+/)
+        .filter(Boolean)
+        .slice(0, 2)
+        .map(function (word) { return word[0].toUpperCase(); })
+        .join('') || '?';
+}
 
 function setupMobileMenu() {
     const layout = document.querySelector('.admin-layout');
