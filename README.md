@@ -53,6 +53,8 @@ If PHP is already added to your Windows `PATH`, you can start the server with `p
 - View available dates, times, and slots (live from `class_schedules` with real booked counts)
 - Book or cancel a class (capacity and duplicate-booking rules enforced in a MySQL transaction)
 - View upcoming bookings
+- Filter member classes by search text, availability, booked status, or full status
+- QR gym check-in for members and administrators, with camera scanning and QR image upload support
 - Admin can add, edit, or remove membership plans and classes
 - Admin can manage schedules, members, and reservations
 - Admin can open or close schedules with an Open/Close toggle; closed schedules cannot be booked
@@ -81,6 +83,8 @@ The website is simple and manageable to develop but still has enough features fo
 | 7   | Admin: add, edit, remove membership plans and classes                    | Connected | Modal forms on `pages/admin/memberships.html` and `classes.html` write to `membership_plans` / `fitness_classes` (`api/plans.php`, `api/classes.php`); deleting a plan used by members is blocked                                             |
 | 8   | Admin: manage schedules, members, and reservations                       | Connected | Separate pages with add/delete/open/close schedules (`api/schedules.php`), member removal (`api/members.php`), and popup-protected confirm/cancel reservations (`api/reservations.php`)                                                       |
 | 9   | Monitor available slots to avoid overbooking                             | Connected | Real booked/capacity counts everywhere; bookings are blocked at capacity inside a transaction with row locks                                                                                                                                  |
+| 10  | Filter fitness classes                                                   | Connected | Member class browsing supports text search and filters for available, booked, and full classes (`pages/users/classes.html`, `js/user.js`)                                                                                                     |
+| 11  | QR gym check-in                                                          | Connected | Members display their QR code and scan the gym QR; administrators generate the gym QR and scan member QR codes using camera or image upload (`api/checkin.php`, `js/checkin-user.js`, `js/checkin-admin.js`)                                  |
 
 ### Completed So Far
 
@@ -92,6 +96,10 @@ The website is simple and manageable to develop but still has enough features fo
 - Login/Register popup with branding panel and demo admin/member credentials
 - Admin panel (one HTML file per section): sidebar links, dashboard stats (`pages/admin/dashboard.html`), plans/classes CRUD with modal forms (`memberships.html`, `classes.html`), add/delete/open/close schedules with slot bars, members, reservations (confirm/cancel), confirmation popups, avatar menu (Profile, Settings, Logout) - all backed by the PHP API
 - Member portal (one HTML file per section): overview stats (`pages/users/dashboard.html`), membership plan cards with choose-plan (`memberships.html`), class browsing with slot bars and book/cancel (`classes.html`), My Bookings table with empty state (`bookings.html`), profile form (`profile.html`) - all backed by the PHP API
+- Member class filters for search, available spots, existing bookings, and full classes
+- QR check-in flow for members and administrators, including generated QR codes, live camera scanning, image upload fallback, and duplicate check-in warnings
+- Responsive homepage, admin portal, and member portal layouts with mobile navigation
+- Shared page reload control for admin and member portal pages
 - PHP backend (`api/`): session login/logout, registration, plans/classes/schedules/members/reservations CRUD, transactional booking with capacity checks, profile and membership updates, dashboard stats
 - MySQL database: feature-to-table design in `Database/MySQL/database.md`, importable schema + seed data in `Database/MySQL/fitspot.sql` (6 tables, slot-usage view, demo accounts, demo bookings)
 - Feature-folder structure (`api/`, `css/`, `js/`, `images/`, `Database/MySQL`, `pages/admin/`, `pages/users`)
@@ -102,7 +110,8 @@ Frontend
 
 - HTML5
 - CSS3
-- JavaScript (fetch API, modals, hero carousel, admin panel, member portal)
+- JavaScript (fetch API, modals, hero carousel, filtering, QR scanning, admin panel, member portal)
+- QRCode.js and jsQR via CDN for QR generation and scanning
   Backend
 - PHP 8.1 + PDO (JSON API in `api/`, sessions, bcrypt password hashing)
 - MySQL 8.0 (schema, slot-usage view, seed data)
@@ -166,7 +175,10 @@ FitSpot/
 ├── js/
 │   ├── script.js           # Login/Register, homepage live data, booking form, hero carousel
 │   ├── admin.js            # Admin panel logic (API guard, CRUD, modals, avatar menu)
-│   └── user.js             # Member portal logic (API guard, booking/cancel, plans, profile)
+│   ├── user.js             # Member portal logic (API guard, filters, booking/cancel, plans, profile)
+│   ├── checkin-admin.js    # Admin QR generation, member scanning, and duplicate check-in handling
+│   ├── checkin-user.js     # Member QR generation, gym scanning, and duplicate check-in handling
+│   └── reload.js            # Shared portal reload button
 └── pages/
     ├── login.html          # Standalone login / registration page
     ├── admin/
@@ -175,12 +187,14 @@ FitSpot/
     │   ├── classes.html        # Fitness classes CRUD
     │   ├── schedules.html      # Schedules with slot usage bars and Open/Close controls
     │   ├── members.html        # Members table
-    │   └── reservations.html   # Reservations (confirm/cancel)
+    │   ├── reservations.html   # Reservations (confirm/cancel)
+    │   └── checkin.html        # Gym QR generation and member QR scanning
     └── users/
         ├── dashboard.html      # Overview: stats + upcoming bookings
         ├── memberships.html    # Plan cards with choose-plan demo
-        ├── classes.html        # Browse classes, book with slot bars
+        ├── classes.html        # Browse classes, filter, and book with slot bars
         ├── bookings.html       # My Bookings table (statuses, cancel)
+        ├── checkin.html        # Member QR display and gym QR scanning
         └── profile.html        # Profile form + membership summary
 ```
 
