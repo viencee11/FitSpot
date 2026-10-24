@@ -22,6 +22,14 @@
     margin: 16px 0;
 }
 
+.qr-camera[hidden] {
+    display: none;
+}
+
+.qr-camera:not([hidden]) {
+    display: block;
+}
+
 .qr-upload {
     position: absolute;
     width: 1px;
