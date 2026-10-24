@@ -33,6 +33,26 @@ endpoint(function () {
         }
 
         $stmt = db()->query(
+            "SELECT u.full_name, c.name AS class_name, s.schedule_date,
+                    s.start_time, s.end_time
+               FROM bookings b
+               JOIN users u ON u.id = b.user_id
+               JOIN class_schedules s ON s.id = b.schedule_id
+               JOIN fitness_classes c ON c.id = s.class_id
+              WHERE b.status = 'cancelled'
+                AND b.cancelled_at >= NOW() - INTERVAL 1 DAY
+              ORDER BY b.cancelled_at DESC
+              LIMIT 10"
+        );
+        foreach ($stmt->fetchAll() as $row) {
+            $notifications[] = [
+                'type' => 'cancelled',
+                'message' => $row['full_name'] . ' cancelled their ' . $row['class_name'] . ' booking.',
+                'detail' => schedule_label($row['schedule_date'], $row['start_time'], $row['end_time']),
+            ];
+        }
+
+        $stmt = db()->query(
             "SELECT c.name AS class_name, s.schedule_date, s.start_time, s.end_time,
                     s.capacity - (
                         SELECT COUNT(*) FROM bookings b
@@ -75,6 +95,26 @@ endpoint(function () {
             $notifications[] = [
                 'type' => 'confirmed',
                 'message' => 'Your ' . $row['class_name'] . ' booking is confirmed.',
+                'detail' => schedule_label($row['schedule_date'], $row['start_time'], $row['end_time']),
+            ];
+        }
+
+        $stmt = db()->prepare(
+            "SELECT c.name AS class_name, s.schedule_date, s.start_time, s.end_time
+               FROM bookings b
+               JOIN class_schedules s ON s.id = b.schedule_id
+               JOIN fitness_classes c ON c.id = s.class_id
+              WHERE b.user_id = ?
+                AND b.status = 'cancelled'
+                AND b.cancelled_at >= NOW() - INTERVAL 1 DAY
+              ORDER BY b.cancelled_at DESC
+              LIMIT 10"
+        );
+        $stmt->execute([(int) $user['id']]);
+        foreach ($stmt->fetchAll() as $row) {
+            $notifications[] = [
+                'type' => 'cancelled',
+                'message' => 'Your ' . $row['class_name'] . ' booking was cancelled.',
                 'detail' => schedule_label($row['schedule_date'], $row['start_time'], $row['end_time']),
             ];
         }
