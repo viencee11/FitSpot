@@ -27,10 +27,12 @@ endpoint(function () {
         foreach ($rows as $row) {
             if ($row['plan_name'] === null) {
                 $badge = ['No Plan', 'badge-gray'];
-            } elseif ($row['membership_status'] === 'active'
+            } elseif (
+                $row['membership_status'] === 'active'
                 && $row['end_date'] !== null
-                && new DateTime($row['end_date']) >= $today) {
-                $badge = ['Active', 'badge-green'];
+                && new DateTime($row['end_date']) >= $today
+            ) {
+                $badge = ['Membership Active', 'badge-green'];
             } else {
                 $badge = ['Expired', 'badge-gray'];
             }
