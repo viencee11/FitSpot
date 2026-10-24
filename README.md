@@ -61,6 +61,7 @@ If PHP is already added to your Windows `PATH`, you can start the server with `p
 - Confirmation popups protect admin reservation confirmations, deletions, and logout actions
 - Success and error feedback appears through side toast notifications instead of inline alert banners
 - Monitor available slots to avoid overbooking
+- Notification bell shows members confirmed bookings and alerts administrators about new bookings and schedules with near-empty slots
 
 ## Benefits
 
