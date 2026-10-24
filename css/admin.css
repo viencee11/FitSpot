@@ -416,6 +416,16 @@ a.btn-sm {
     transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
+.qr-modal {
+    max-width: 420px;
+    text-align: center;
+}
+
+.qr-modal .qr-box {
+    min-height: 252px;
+    align-items: center;
+}
+
 .btn-pill:hover {
     background-color: #ea580c;
     color: white;
