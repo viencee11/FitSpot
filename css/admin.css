@@ -262,6 +262,12 @@
     box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
 }
 
+.section-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
 .section-head h2 {
     margin: 0;
     font-size: 20px;
@@ -594,6 +600,15 @@ button:disabled {
     .section-head > .btn-pill,
     .section-head > a {
         width: 100%;
+        text-align: center;
+    }
+
+    .section-actions {
+        width: 100%;
+    }
+
+    .section-actions > a {
+        flex: 1 1 160px;
         text-align: center;
     }
 
