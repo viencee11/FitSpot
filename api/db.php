@@ -95,6 +95,23 @@ function json_in(): array
     return is_array($data) ? $data : [];
 }
 
+function csrf_token(): string
+{
+    start_session();
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['csrf_token'];
+}
+
+function require_csrf(): void
+{
+    $provided = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+    if (!is_string($provided) || $provided === '' || !hash_equals(csrf_token(), $provided)) {
+        fail('Invalid security token.', 419);
+    }
+}
+
 function fail(string $message, int $status = 400): never
 {
     json_out(['error' => $message], $status);
@@ -109,6 +126,12 @@ function post_value(array $input, string $key): string
 function endpoint(callable $fn): void
 {
     try {
+        $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+        $script = basename($_SERVER['SCRIPT_NAME'] ?? '');
+        if (in_array($method, ['POST', 'PUT', 'DELETE'], true)
+            && !in_array($script, ['login.php', 'register.php'], true)) {
+            require_csrf();
+        }
         $fn();
     } catch (PDOException $e) {
         error_log('[fitspot] ' . $e->getMessage());
