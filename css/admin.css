@@ -770,6 +770,25 @@ button:disabled {
     .topbar-actions {
         width: auto;
         margin-left: auto;
+        gap: 8px;
+    }
+
+    .notification-dropdown {
+        position: fixed;
+        top: 64px;
+        right: 12px;
+        left: 12px;
+        width: auto;
+        max-height: calc(100vh - 80px);
+        padding: 15px;
+    }
+
+    .notification-list {
+        max-height: calc(100vh - 140px);
+    }
+
+    .notification-item {
+        padding: 12px 0;
     }
 
     .section-head {
