@@ -18,7 +18,11 @@ endpoint(function () {
             (SELECT COUNT(*) FROM bookings WHERE status = 'pending') AS pending_reservations"
     )->fetch();
 
-    $recent = db()->query(
+    $page = max(1, (int) ($_GET['page'] ?? 1));
+    $pageSize = 5;
+    $offset = ($page - 1) * $pageSize;
+
+    $stmt = db()->prepare(
         "SELECT b.id, b.status,
                 u.full_name AS member,
                 c.name AS class_name,
@@ -28,8 +32,16 @@ endpoint(function () {
            JOIN class_schedules s ON s.id = b.schedule_id
            JOIN fitness_classes c ON c.id = s.class_id
           ORDER BY b.booked_at DESC, b.id DESC
-          LIMIT 5"
-    )->fetchAll();
+          LIMIT :page_size_plus_one OFFSET :offset"
+    );
+    $stmt->bindValue(':page_size_plus_one', $pageSize + 1, PDO::PARAM_INT);
+    $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+    $stmt->execute();
+    $recent = $stmt->fetchAll();
+    $hasMore = count($recent) > $pageSize;
+    if ($hasMore) {
+        array_pop($recent);
+    }
 
     $result = [];
     foreach ($recent as $row) {
@@ -53,5 +65,7 @@ endpoint(function () {
             'pending_reservations'=> (int) $counts['pending_reservations'],
         ],
         'recent' => $result,
+        'recent_page' => $page,
+        'recent_has_more' => $hasMore,
     ]);
 });
