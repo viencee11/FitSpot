@@ -30,7 +30,7 @@ Register now creates real member accounts (bcrypt-hashed passwords) - new accoun
 The site must be **served over HTTP** (the pages talk to a PHP API; opening `index.html` as a file will not work). The steps below use XAMPP on Windows:
 
 ```powershell
-# 1. Open the XAMPP Control Panel and start Apache and MySQL/Laragon.
+# 1. Open the XAMPP Control Panel and start Apache and MySQL.
 
 # 2. Open PowerShell and go to the project folder:
 cd C:\FitSpot
@@ -40,13 +40,26 @@ cd C:\FitSpot
 & "C:\xampp\mysql\bin\mysql.exe" -u root < Database\MySQL\fitspot.sql
 
 # 4. Start the PHP development server from the project folder:
-& "C:\xampp\php\php.exe" -S localhost:8000
+& "C:\xampp\php\php.exe" -S 0.0.0.0:8000
 
 # 5. Open the site in a browser:
 #    http://localhost:8000
 ```
 
-If PHP is already added to your Windows `PATH`, you can start the server with `php -S localhost:8000` instead. If you use Laragon, start its MySQL service and replace the XAMPP PHP/MySQL paths with the corresponding Laragon paths. The database connection in `api/db.php` uses MySQL on `127.0.0.1:3306` with the local `root` account and no password.
+If PHP is already added to your Windows `PATH`, you can start the server with `php -S 0.0.0.0:8000` instead. If you use Laragon, start its MySQL service and replace the XAMPP PHP/MySQL paths with the corresponding Laragon paths. The database connection in `api/db.php` uses MySQL on `127.0.0.1:3306` with the local `root` account and no password.
+
+### Access the Website from a Phone
+
+To let a member access the site from a phone:
+
+1. Connect the computer and the phone to the same Wi-Fi network.
+2. Start the PHP server with `-S 0.0.0.0:8000` as shown above. This makes the server available to other devices on the local network.
+3. On the computer, run `ipconfig` in PowerShell and find the **IPv4 Address** of the active Wi-Fi adapter, for example `192.168.1.25`.
+4. On the phone, open a browser and visit the computer's IP address with port `8000`:
+
+   `http://192.168.1.25:8000`
+
+Replace `192.168.1.25` with the actual IPv4 address shown on the computer. If Windows Firewall displays a prompt when starting PHP, allow PHP or port `8000` on private networks. The computer and phone must remain connected to the same network while using the site.
 
 ## Main Features
 
