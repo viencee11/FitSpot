@@ -30,7 +30,7 @@ Register now creates real member accounts (bcrypt-hashed passwords) - new accoun
 The site must be **served over HTTP** (the pages talk to a PHP API; opening `index.html` as a file will not work). The steps below use XAMPP on Windows:
 
 ```powershell
-# 1. Open the XAMPP Control Panel and start Apache and MySQL.
+# 1. Open the XAMPP Control Panel and start Apache and MySQL/Laragon.
 
 # 2. Open PowerShell and go to the project folder:
 cd C:\FitSpot
