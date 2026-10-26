@@ -27,23 +27,26 @@ Register now creates real member accounts (bcrypt-hashed passwords) - new accoun
 
 ## How to Run
 
-The site must be **served over HTTP** (the pages talk to a PHP API; opening `index.html` as a file will not work). The steps below use Laragon on Windows:
+The site must be **served over HTTP** (the pages talk to a PHP API; opening `index.html` as a file will not work). The steps below use XAMPP on Windows:
 
 ```powershell
-# 1. Start Laragon and make sure MySQL is running.
+# 1. Open the XAMPP Control Panel and start Apache and MySQL.
 
-# 2. From the project root, import the database once:
-mysql -u root < Database/MySQL/fitspot.sql
+# 2. Open PowerShell and go to the project folder:
+cd C:\FitSpot
 
-# 3. Start the PHP server from the project root.
-# If "php" is not recognized, use the full Laragon PHP path:
-& "C:\laragon\bin\php\php-8.1.10-Win32-vs16-x64\php.exe" -S localhost:8000
+# 3. Import the database once. If the MySQL command is not in PATH,
+#    use the full XAMPP path:
+& "C:\xampp\mysql\bin\mysql.exe" -u root < Database\MySQL\fitspot.sql
 
-# 4. Open the site:
+# 4. Start the PHP development server from the project folder:
+& "C:\xampp\php\php.exe" -S localhost:8000
+
+# 5. Open the site in a browser:
 #    http://localhost:8000
 ```
 
-If PHP is already added to your Windows `PATH`, you can start the server with `php -S localhost:8000` instead. The database connection in `api/db.php` uses MySQL on `127.0.0.1:3306` with the local `root` account and no password.
+If PHP is already added to your Windows `PATH`, you can start the server with `php -S localhost:8000` instead. If you use Laragon, start its MySQL service and replace the XAMPP PHP/MySQL paths with the corresponding Laragon paths. The database connection in `api/db.php` uses MySQL on `127.0.0.1:3306` with the local `root` account and no password.
 
 ## Main Features
 
